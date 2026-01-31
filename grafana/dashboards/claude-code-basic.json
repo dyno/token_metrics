@@ -85,7 +85,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats count() as requests",
+          "expr": "_msg:claude_code.api_request | stats count() as requests",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -144,7 +144,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(input_tokens) as tokens",
+          "expr": "_msg:claude_code.api_request | stats sum(input_tokens) as tokens",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -203,7 +203,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(output_tokens) as tokens",
+          "expr": "_msg:claude_code.api_request | stats sum(output_tokens) as tokens",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -262,7 +262,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats avg(duration_ms) as ms",
+          "expr": "_msg:claude_code.api_request | stats avg(duration_ms) as ms",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -337,7 +337,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats count() as requests",
+          "expr": "_msg:claude_code.api_request | stats count() as requests",
           "legendFormat": "requests",
           "queryType": "statsRange",
           "refId": "A"
@@ -400,7 +400,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(input_tokens) as tokens",
+          "expr": "_msg:claude_code.api_request | stats sum(input_tokens) as tokens",
           "legendFormat": "input",
           "queryType": "statsRange",
           "refId": "A"
@@ -411,7 +411,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(output_tokens) as tokens",
+          "expr": "_msg:claude_code.api_request | stats sum(output_tokens) as tokens",
           "legendFormat": "output",
           "queryType": "statsRange",
           "refId": "B"
@@ -486,7 +486,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats by (model) sum(output_tokens) as tokens",
+          "expr": "_msg:claude_code.api_request | stats by (model) sum(output_tokens) as tokens",
           "legendFormat": "{{ model }}",
           "queryType": "statsRange",
           "refId": "A"
@@ -548,13 +548,13 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats by (status) count() as requests",
-          "legendFormat": "{{ status }}",
+          "expr": "_msg:claude_code.api_request | stats by (model) count() as requests",
+          "legendFormat": "{{ model }}",
           "queryType": "statsRange",
           "refId": "A"
         }
       ],
-      "title": "Requests by Status",
+      "title": "Requests by Model",
       "type": "timeseries"
     }
   ],
