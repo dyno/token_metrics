@@ -85,7 +85,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats count() as requests",
+          "expr": "event.name:codex.api_request | stats count() as requests",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -144,7 +144,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(input_tokens) as tokens",
+          "expr": "event.name:codex.sse_event event.kind:response.completed | stats sum(input_token_count) as tokens",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -203,7 +203,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(output_tokens) as tokens",
+          "expr": "event.name:codex.sse_event event.kind:response.completed | stats sum(output_token_count) as tokens",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -262,7 +262,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats avg(duration_ms) as ms",
+          "expr": "event.name:codex.api_request | stats avg(duration_ms) as ms",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -337,7 +337,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats count() as requests",
+          "expr": "event.name:codex.api_request | stats count() as requests",
           "legendFormat": "requests",
           "queryType": "statsRange",
           "refId": "A"
@@ -400,7 +400,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(input_tokens) as tokens",
+          "expr": "event.name:codex.sse_event event.kind:response.completed | stats sum(input_token_count) as tokens",
           "legendFormat": "input",
           "queryType": "statsRange",
           "refId": "A"
@@ -411,7 +411,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats sum(output_tokens) as tokens",
+          "expr": "event.name:codex.sse_event event.kind:response.completed | stats sum(output_token_count) as tokens",
           "legendFormat": "output",
           "queryType": "statsRange",
           "refId": "B"
@@ -486,7 +486,7 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats by (model) sum(output_tokens) as tokens",
+          "expr": "event.name:codex.sse_event event.kind:response.completed | stats by (model) sum(output_token_count) as tokens",
           "legendFormat": "{{ model }}",
           "queryType": "statsRange",
           "refId": "A"
@@ -548,19 +548,19 @@
             "uid": "ds-vlogs"
           },
           "editorMode": "code",
-          "expr": "event.name:claude_code.api_request | stats by (status) count() as requests",
-          "legendFormat": "{{ status }}",
+          "expr": "event.name:codex.api_request | stats by (http.response.status_code) count() as requests",
+          "legendFormat": "{{ http.response.status_code }}",
           "queryType": "statsRange",
           "refId": "A"
         }
       ],
-      "title": "Requests by Status",
+      "title": "Requests by Status Code",
       "type": "timeseries"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 38,
-  "tags": ["claude", "claude-code", "observability", "logs"],
+  "tags": ["openai", "codex", "observability", "logs"],
   "templating": {
     "list": []
   },
@@ -570,8 +570,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Claude Code - Basic Metrics (Logs)",
-  "uid": "claude-code-basic",
+  "title": "OpenAI Codex - Basic Metrics (Logs)",
+  "uid": "openai-codex-basic",
   "version": 2,
   "weekStart": ""
 }

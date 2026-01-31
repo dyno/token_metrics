@@ -1,23 +1,23 @@
-# Claude Code Monitoring Stack
+# AI Coding Assistant Monitoring Stack
 
-Local observability stack for monitoring Claude Code usage, costs, and performance.
+Local observability stack for monitoring **Claude Code** and **OpenAI Codex** usage, costs, and performance.
 
 ## Architecture
 
 ```
 ┌─────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
-│   Claude Code   │────▶│  OTEL Collector      │────▶│   Prometheus    │
-│   (Terminal)    │     │  (localhost:4317)    │     │   (Metrics)     │
+│  Claude Code    │────▶│  OTEL Collector      │────▶│   Prometheus    │
+│  or Codex CLI   │     │  (localhost:4317)    │     │   (Metrics)     │
 └─────────────────┘     └──────────────────────┘     └─────────────────┘
-                                │                            │
-                                │                            ▼
-                                │                    ┌─────────────────┐
-                                └───────────────────▶│   Grafana       │
-                                                     │   (Dashboard)   │
-                                ┌─────────────────┐  └─────────────────┘
-                                │  VictoriaLogs   │          ▲
-                                │   (Events)      │──────────┘
-                                └─────────────────┘
+                               │                            │
+                               │                            ▼
+                               │                    ┌─────────────────┐
+                               └───────────────────▶│   Grafana       │
+                                                    │   (Dashboard)   │
+                               ┌─────────────────┐  └─────────────────┘
+                               │  VictoriaLogs   │          ▲
+                               │   (Events)      │──────────┘
+                               └─────────────────┘
 ```
 
 ## Quick Start
@@ -29,6 +29,8 @@ cd token_metrics
 docker-compose up -d
 ```
 
+Persistent data is stored under `./data/` (Prometheus, VictoriaMetrics, VictoriaLogs, Grafana).
+
 ### 2. Verify services are running
 
 ```bash
@@ -36,19 +38,21 @@ docker-compose ps
 ```
 
 All services should show as "Up":
-- `otel-collector` - Receives telemetry from Claude Code
+- `otel-collector` - Receives telemetry from Claude Code / Codex
 - `prometheus` - Stores metrics
 - `victorialogs` - Stores events/logs
 - `grafana` - Visualization
 
-### 3. Run Claude Code with telemetry
+### 3. Run your AI coding assistant with telemetry
 
-Option A: Use the provided script:
+#### Option A: Claude Code
+
+Use the provided script:
 ```bash
 ./start-claude-code.sh
 ```
 
-Option B: Set environment variables manually:
+Or set environment variables manually:
 ```bash
 export CLAUDE_CODE_ENABLE_TELEMETRY=1
 export OTEL_METRICS_EXPORTER=otlp
@@ -58,13 +62,40 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 claude
 ```
 
+#### Option B: OpenAI Codex
+
+First, configure `~/.codex/config.toml`:
+```toml
+[otel]
+environment = "dev"
+log_user_prompt = false
+
+[otel.exporter."otlp-grpc"]
+endpoint = "http://localhost:4317"
+```
+
+Then run Codex:
+```bash
+./start-codex.sh
+```
+
+Or start directly:
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4317"
+codex
+```
+
 ### 4. View dashboards
 
 Open Grafana: http://localhost:3000
 - Username: `admin`
 - Password: `admin`
 
-A basic dashboard is pre-provisioned. For the full-featured Pigsty dashboard, see below.
+Pre-provisioned dashboards (log‑derived):
+- **Claude Code - Basic Metrics (Logs)** - Token usage, requests, latency
+- **OpenAI Codex - Basic Metrics (Logs)** - Token usage, requests, latency
+
+Dashboards are provisioned under the **Token Usage** folder in Grafana.
 
 ## Service URLs
 
@@ -75,28 +106,11 @@ A basic dashboard is pre-provisioned. For the full-featured Pigsty dashboard, se
 | VictoriaLogs | http://localhost:9428 | Log queries |
 | OTEL Collector | localhost:4317 (gRPC) | Telemetry receiver |
 
-## Importing the Pigsty Dashboard
+## Telemetry Available
 
-The Pigsty dashboard provides advanced features including session tracking, event timelines, and detailed tool usage analysis.
+This stack ingests OTLP **logs/events** from Claude Code and Codex. The basic dashboards are built from VictoriaLogs queries (log‑derived).
 
-### Steps:
-
-1. Download the dashboard JSON:
-   ```bash
-   curl -sL https://raw.githubusercontent.com/pgsty/pigsty/main/files/grafana/node/claude-code.json \
-     -o grafana/dashboards/claude-code-pigsty.json
-   ```
-
-2. The dashboard will auto-load (Grafana watches the dashboards folder)
-
-3. Or manually import:
-   - Go to Grafana → Dashboards → Import
-   - Upload the JSON file
-   - Select data sources:
-     - `ds-prometheus` → Prometheus
-     - `ds-vlogs` → VictoriaLogs
-
-## Metrics Available
+### Claude Code Metrics (if emitted)
 
 | Metric | Description |
 |--------|-------------|
@@ -108,7 +122,20 @@ The Pigsty dashboard provides advanced features including session tracking, even
 | `claude_code_commit_count` | Git commits created |
 | `claude_code_pull_request_count` | PRs created |
 
+### OpenAI Codex Metrics (if emitted)
+
+| Metric | Description |
+|--------|-------------|
+| `codex_api_request` | API request count and duration |
+| `codex_token_count` | Tokens used (by type: input/output) |
+| `codex_tool_decision` | Tool approvals/denials |
+| `codex_tool_result` | Tool execution duration and success |
+| `codex_sse_event` | Streaming event metrics |
+| `codex_user_prompt` | Prompt length (content redacted by default) |
+
 ## Events Logged
+
+### Claude Code Events
 
 | Event | Description |
 |-------|-------------|
@@ -118,22 +145,31 @@ The Pigsty dashboard provides advanced features including session tracking, even
 | `claude_code.tool_result` | Tool execution results |
 | `claude_code.api_error` | API errors |
 
+### OpenAI Codex Events
+
+| Event | Description |
+|-------|-------------|
+| `codex.user_prompt` | User prompts (content redacted by default) |
+| `codex.api_request` | API calls with model and tokens |
+| `codex.tool_decision` | Tool accept/reject decisions |
+| `codex.tool_result` | Tool execution results |
+| `codex.sse_event` | Streaming events |
+
 ## Configuration
 
-### Enable user prompt logging (optional)
+### Claude Code Configuration
 
-By default, prompt content is redacted. To enable:
+#### Enable user prompt logging (optional)
 ```bash
 export OTEL_LOG_USER_PROMPTS=1
 ```
 
-### Add team/project tags
-
+#### Add team/project tags
 ```bash
 export OTEL_RESOURCE_ATTRIBUTES="team=data-engineering,project=log-ingestion"
 ```
 
-### Persist telemetry settings
+#### Persist telemetry settings
 
 Add to your shell profile (`~/.bashrc` or `~/.zshrc`):
 ```bash
@@ -145,6 +181,47 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 ```
 
+### OpenAI Codex Configuration
+
+#### Full config.toml example
+
+Create/edit `~/.codex/config.toml`:
+```toml
+[otel]
+environment = "dev"          # dev | staging | prod
+log_user_prompt = false      # set true to log prompt content
+
+# OTLP/gRPC exporter (the section name sets the exporter type)
+[otel.exporter."otlp-grpc"]
+endpoint = "http://localhost:4317"
+
+# For OTLP/HTTP instead, replace the above with:
+# [otel.exporter."otlp-http"]
+# endpoint = "http://localhost:4318/v1/logs"
+# protocol = "binary"        # or "json"
+
+[analytics]
+enabled = false              # disable anonymous metrics to OpenAI
+```
+
+#### Add team/project tags
+```bash
+export OTEL_RESOURCE_ATTRIBUTES="team=data-engineering,project=log-ingestion"
+```
+
+## Importing Advanced Dashboards
+
+### Pigsty Dashboard (Claude Code)
+
+The Pigsty dashboard provides advanced features including session tracking, event timelines, and detailed tool usage analysis.
+
+```bash
+curl -sL https://raw.githubusercontent.com/pgsty/pigsty/main/files/grafana/node/claude-code.json \
+  -o grafana/dashboards/claude-code-pigsty.json
+```
+
+The dashboard will auto-load (Grafana watches the dashboards folder).
+
 ## Troubleshooting
 
 ### Check OTEL Collector logs
@@ -152,14 +229,22 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 docker-compose logs -f otel-collector
 ```
 
-### Verify metrics are being received
+### Verify logs are being received (VictoriaLogs)
 ```bash
-curl http://localhost:8889/metrics | grep claude
+# Claude Code events
+curl 'http://localhost:9428/select/logsql/query?query=event.name:claude_code.api_request'
+
+# Codex events
+curl 'http://localhost:9428/select/logsql/query?query=event.name:codex.api_request'
 ```
 
 ### Query VictoriaLogs directly
 ```bash
-curl 'http://localhost:9428/select/logsql/query?query=_msg:claude_code'
+# Claude Code events
+curl 'http://localhost:9428/select/logsql/query?query=event.name:claude_code.api_request'
+
+# Codex events
+curl 'http://localhost:9428/select/logsql/query?query=event.name:codex.sse_event'
 ```
 
 ### Restart services
@@ -180,7 +265,14 @@ docker-compose down -v
 
 ## References
 
+### Claude Code
 - [Claude Code Monitoring Docs](https://code.claude.com/docs/en/monitoring-usage)
 - [Anthropic Monitoring Guide](https://github.com/anthropics/claude-code-monitoring-guide)
 - [Pigsty Claude Code Dashboard](https://github.com/pgsty/pigsty/blob/main/files/grafana/node/claude-code.json)
+
+### OpenAI Codex
+- [Codex Advanced Configuration](https://developers.openai.com/codex/config-advanced/)
+- [Codex Security & Telemetry](https://developers.openai.com/codex/security/)
+
+### General
 - [OpenTelemetry Configuration](https://opentelemetry.io/docs/collector/configuration/)

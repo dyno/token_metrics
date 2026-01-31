@@ -1,10 +1,10 @@
 apiVersion: 1
 
 providers:
-  - name: 'Claude Code Dashboards'
+  - name: 'Token Usage Dashboards'
     orgId: 1
-    folder: 'Claude Code'
-    folderUid: 'claude-code-folder'
+    folder: 'Token Usage'
+    folderUid: 'token-usage-folder'
     type: file
     disableDeletion: false
     editable: true
