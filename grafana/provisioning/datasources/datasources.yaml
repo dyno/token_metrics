@@ -1,0 +1,29 @@
+apiVersion: 1
+
+datasources:
+  # Prometheus datasource - for metrics
+  - name: Prometheus
+    type: prometheus
+    uid: ds-prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  # VictoriaLogs datasource - for events/logs
+  - name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    uid: ds-vlogs
+    access: proxy
+    url: http://victorialogs:9428
+    editable: true
+    jsonData:
+      maxLines: 1000
+
+  # VictoriaMetrics datasource (alternative to Prometheus)
+  - name: VictoriaMetrics
+    type: prometheus
+    uid: ds-victoriametrics
+    access: proxy
+    url: http://victoriametrics:8428
+    editable: true
