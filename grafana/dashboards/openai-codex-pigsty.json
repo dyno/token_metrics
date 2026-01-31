@@ -1,6 +1,6 @@
 {
   "annotations":{"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"-- Grafana --"},"enable":true,"hide":true,"iconColor":"#BF6C50","name":"Annotations & Alerts","type":"dashboard"}]},
-  "description":"Claude Code Observability",
+  "description":"OpenAI Codex Observability",
   "editable":true,
   "fiscalYearStartMonth":0,
   "graphTooltip":1,
@@ -15,17 +15,17 @@
       "id":2,
       "options":{"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"text":{"titleSize":18,"valueSize":24},"textMode":"value_and_name","wideLayout":true},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request | stats count() as requests","legendFormat":"Requests","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request | stats count() as requests","legendFormat":"Requests","queryType":"statsRange","refId":"A"}],
       "type":"stat"
     },
     {
       "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},
-      "fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"#BF6C50","value":0}]},"unit":"currencyUSD"},"overrides":[]},
+      "fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"#BF6C50","value":0}]},"unit":"short"},"overrides":[]},
       "gridPos":{"h":3,"w":3,"x":3,"y":1},
       "id":3,
       "options":{"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"text":{"titleSize":18,"valueSize":24},"textMode":"value_and_name","wideLayout":true},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request | stats sum(cost_usd) as cost","legendFormat":"Cost","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.sse_event event.kind:response.completed | stats sum(output_token_count) as tokens","legendFormat":"Output Tokens","queryType":"statsRange","refId":"A"}],
       "type":"stat"
     },
     {
@@ -34,7 +34,7 @@
         "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
         "overrides":[
           {"matcher":{"id":"byName","options":"duration_ms"},"properties":[{"id":"unit","value":"ms"},{"id":"custom.width","value":100},{"id":"custom.cellOptions","value":{"mode":"gradient","type":"color-background"}},{"id":"thresholds","value":{"mode":"absolute","steps":[{"color":"#5B8C7A","value":0},{"color":"#C9A257","value":2000},{"color":"#C45B47","value":5000}]}}]},
-          {"matcher":{"id":"byName","options":"SessionID"},"properties":[{"id":"custom.width","value":308},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.SessionID}","url":"/d/claude-code?var-session=${__data.fields.SessionID}&${__url_time_range}"}]}]},{"matcher":{"id":"byName","options":"service.version"},"properties":[{"id":"custom.width","value":120}]},
+          {"matcher":{"id":"byName","options":"ConversationID"},"properties":[{"id":"custom.width","value":308},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.ConversationID}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.ConversationID}&${__url_time_range}"}]}]},{"matcher":{"id":"byName","options":"service.version"},"properties":[{"id":"custom.width","value":120}]},
           {"matcher":{"id":"byName","options":"os.type"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"os.version"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"host.arch"},"properties":[{"id":"custom.width","value":80}]},{"matcher":{"id":"byName","options":"terminal.type"},"properties":[{"id":"custom.width","value":133}]},
           {
             "matcher":{"id":"byName","options":"event.name"},
@@ -54,7 +54,7 @@
       "id":56,
       "options":{"cellHeight":"sm","showHeader":true,"sortBy":[]},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude ","queryType":"instant","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude service.name:codex_cli_rs ","queryType":"instant","refId":"A"}],
       "transformations":[
         {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
         {
@@ -125,7 +125,7 @@
               "scope.version":4,
               "service.name":5,
               "service.version":6,
-              "session.id":0,
+              "conversation.id":0,
               "severity":22,
               "source":36,
               "success":31,
@@ -136,7 +136,7 @@
               "use_id":38,
               "user.id":2
             },
-            "renameByName":{"cache_creation_tokens":"","cache_read_tokens":"","duration_ms":"","labels":"","prompt_length":"len","scope.name":"","service.name":"","session.id":"","unit":"","user.id":""}
+            "renameByName":{"cache_creation_tokens":"","cache_read_tokens":"","duration_ms":"","labels":"","prompt_length":"len","scope.name":"","service.name":"","conversation.id":"","unit":"","user.id":""}
           }
         },{
           "id":"groupBy",
@@ -151,7 +151,7 @@
               "scope.version"  :{ "aggregations":[]                   ,"operation":"groupby"   },
               "service.name"   :{ "aggregations":[]                   ,"operation":"groupby"   },
               "service.version":{ "aggregations":[]                   ,"operation":"groupby"   },
-              "session.id"     :{ "aggregations":[]                   ,"operation":"groupby"   },
+              "conversation.id"     :{ "aggregations":[]                   ,"operation":"groupby"   },
               "terminal.type"  :{ "aggregations":[]                   ,"operation":"groupby"   },
               "user.id"        :{ "aggregations":[]                   ,"operation":"groupby"   }
             }
@@ -161,9 +161,9 @@
           "options":{
             "excludeByName":{"scope.name":true,"scope.version":true},
             "includeByName":{},
-            "indexByName":{"Time (count)":2,"Time (max)":4,"Time (min)":3,"host.arch":12,"ip":1,"os.type":10,"os.version":11,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"session.id":0,"terminal.type":13,"user.id":5},
+            "indexByName":{"Time (count)":2,"Time (max)":4,"Time (min)":3,"host.arch":12,"ip":1,"os.type":10,"os.version":11,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"conversation.id":0,"terminal.type":13,"user.id":5},
             "orderByMode":"manual",
-            "renameByName":{"Time (count)":"Logs","Time (max)":"Last Seen","Time (min)":"First Seen","Time (range)":"Time","host.arch":"Arch","ip":"IP","os.type":"OS","os.version":"OS Version","service.name":"Service","service.version":"Version","session.id":"SessionID","terminal.type":"Term","user.id":"UserID"}
+            "renameByName":{"Time (count)":"Logs","Time (max)":"Last Seen","Time (min)":"First Seen","Time (range)":"Time","host.arch":"Arch","ip":"IP","os.type":"OS","os.version":"OS Version","service.name":"Service","service.version":"Version","conversation.id":"ConversationID","terminal.type":"Term","user.id":"UserID"}
           }
         }
       ],
@@ -176,20 +176,20 @@
       "id":4,
       "options":{"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"text":{"titleSize":18,"valueSize":24},"textMode":"value_and_name","wideLayout":true},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request | stats sum(input_tokens) as tokens","legendFormat":"Input Tokens","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.sse_event event.kind:response.completed | stats sum(input_token_count) as tokens","legendFormat":"Input Tokens","queryType":"statsRange","refId":"A"}],
       "type":"stat"
     },
     {
       "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},
-      "fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"#BF6C50","value":0}]},"unit":"short"},"overrides":[]},
+      "fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"#BF6C50","value":0}]},"unit":"ms"},"overrides":[]},
       "gridPos":{"h":3,"w":3,"x":3,"y":4},
       "id":5,
       "options":{"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"text":{"titleSize":18,"valueSize":24},"textMode":"auto","wideLayout":true},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request | stats sum(output_tokens) as tokens","legendFormat":"Output Tokens","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request | stats avg(duration_ms) as ms","legendFormat":"Avg Latency","queryType":"statsRange","refId":"A"}],
       "type":"stat"
     },
-    {"collapsed":false,"gridPos":{"h":1,"w":24,"x":0,"y":7},"id":60,"panels":[],"title":"Session : $session","type":"row"},
+    {"collapsed":false,"gridPos":{"h":1,"w":24,"x":0,"y":7},"id":60,"panels":[],"title":"Conversation : $conversation","type":"row"},
     {
       "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},
       "fieldConfig":{
@@ -230,10 +230,10 @@
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
       "targets":[
-        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.user_prompt session.id:\"$session\" | stats count() as requests"  ,             "legendFormat":"User Prompt"  ,"queryType":"statsRange","refId":"A" },
-        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats count() as requests"  ,"hide":false,"legendFormat":"API Request"  ,"queryType":"statsRange","refId":"B" },
-        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.tool_decision session.id:\"$session\" | stats count() as requests","hide":false,"legendFormat":"Tool Decision","queryType":"statsRange","refId":"C" },
-        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.tool_result session.id:\"$session\" | stats count() as requests"  ,"hide":false,"legendFormat":"Tool Result"  ,"queryType":"statsRange","refId":"D" }
+        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.user_prompt conversation.id:\"$conversation\" | stats count() as requests"  ,             "legendFormat":"User Prompt"  ,"queryType":"statsRange","refId":"A" },
+        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats count() as requests"  ,"hide":false,"legendFormat":"API Request"  ,"queryType":"statsRange","refId":"B" },
+        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.tool_decision conversation.id:\"$conversation\" | stats count() as requests","hide":false,"legendFormat":"Tool Decision","queryType":"statsRange","refId":"C" },
+        { "datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.tool_result conversation.id:\"$conversation\" | stats count() as requests"  ,"hide":false,"legendFormat":"Tool Result"  ,"queryType":"statsRange","refId":"D" }
       ],
       "type":"timeseries"
     },
@@ -244,7 +244,7 @@
         "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
         "overrides":[
           {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-          {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+          {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
           {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
           {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
           {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -340,7 +340,7 @@
       "id":57,
       "options":{"cellHeight":"sm","showHeader":true,"sortBy":[]},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude session.id:\"$session\"","queryType":"instant","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude service.name:codex_cli_rs conversation.id:\"$conversation\"","queryType":"instant","refId":"A"}],
       "title":"Events",
       "transformations":[
         {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
@@ -368,7 +368,7 @@
               "scope.version":true,
               "service.name":true,
               "service.version":true,
-              "session.id":true,
+              "conversation.id":true,
               "severity":true,
               "terminal.type":true,
               "unit":false,
@@ -405,7 +405,7 @@
               "scope.version":4,
               "service.name":5,
               "service.version":6,
-              "session.id":1,
+              "conversation.id":1,
               "severity":28,
               "source":24,
               "success":25,
@@ -440,7 +440,7 @@
               "scope.version":"Version",
               "service.name":"Service",
               "service.version":"Ver",
-              "session.id":"Session",
+              "conversation.id":"Conversation",
               "source":"Source",
               "success":"Success",
               "terminal.type":"Term",
@@ -500,8 +500,8 @@
           "id":59,
           "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
           "pluginVersion":"12.3.1",
-          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.user_prompt | stats by (session.id) count() as requests","legendFormat":"{{ session.id }}","queryType":"statsRange","refId":"A"}],
-          "title":"Prompt by Session",
+          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.user_prompt | stats by (conversation.id) count() as requests","legendFormat":"{{ conversation.id }}","queryType":"statsRange","refId":"A"}],
+          "title":"Prompt by Conversation",
           "type":"timeseries"
         },
         {
@@ -511,7 +511,7 @@
             "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
             "overrides":[
               {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-              {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+              {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
               {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
               {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
               {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -608,8 +608,8 @@
           "id":58,
           "options":{"cellHeight":"sm","showHeader":true,"sortBy":[{"desc":true,"displayName":"Time"}]},
           "pluginVersion":"12.3.1",
-          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.user_prompt","queryType":"instant","refId":"A"}],
-          "title":"Claude Code Prompts",
+          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.user_prompt","queryType":"instant","refId":"A"}],
+          "title":"OpenAI Codex Prompts",
           "transformations":[
             {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
             {
@@ -637,14 +637,14 @@
                   "scope.version":true,
                   "service.name":true,
                   "service.version":true,
-                  "session.id":false,
+                  "conversation.id":false,
                   "severity":true,
                   "terminal.type":true,
                   "unit":false,
                   "user.id":true
                 },
                 "includeByName":{},
-                "indexByName":{"Line":17,"Time":0,"_stream_id":20,"detected_level":18,"event.name":14,"event.sequence":3,"event.timestamp":1,"host.arch":12,"ip":21,"job":22,"labels":19,"os.type":10,"os.version":11,"prompt":15,"prompt_length":4,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"session.id":2,"severity":16,"terminal.type":13,"user.id":5},
+                "indexByName":{"Line":17,"Time":0,"_stream_id":20,"detected_level":18,"event.name":14,"event.sequence":3,"event.timestamp":1,"host.arch":12,"ip":21,"job":22,"labels":19,"os.type":10,"os.version":11,"prompt":15,"prompt_length":4,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"conversation.id":2,"severity":16,"terminal.type":13,"user.id":5},
                 "renameByName":{
                   "cache_creation_tokens":"T$.Create",
                   "cache_read_tokens":"T$.Read",
@@ -670,7 +670,7 @@
                   "scope.version":"Version",
                   "service.name":"Service",
                   "service.version":"Ver",
-                  "session.id":"Session",
+                  "conversation.id":"Conversation",
                   "source":"Source",
                   "success":"Success",
                   "terminal.type":"Term",
@@ -687,7 +687,7 @@
           "type":"table"
         }
       ],
-      "title":"All Sessions",
+      "title":"All Conversations",
       "type":"row"
     },
     {"collapsed":false,"gridPos":{"h":1,"w":24,"x":0,"y":34},"id":65,"panels":[],"title":"User Prompt","type":"row"},
@@ -730,7 +730,7 @@
       "id":66,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":false},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.user_prompt session.id:\"$session\" | stats count() as requests","legendFormat":"Prompt","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.user_prompt conversation.id:\"$conversation\" | stats count() as requests","legendFormat":"Prompt","queryType":"statsRange","refId":"A"}],
       "type":"timeseries"
     },
     {
@@ -740,7 +740,7 @@
         "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
         "overrides":[
           {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-          {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+          {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
           {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
           {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
           {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -837,7 +837,7 @@
       "id":67,
       "options":{"cellHeight":"sm","showHeader":true,"sortBy":[{"desc":true,"displayName":"Time"}]},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.user_prompt session.id:\"$session\"","queryType":"instant","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.user_prompt conversation.id:\"$conversation\"","queryType":"instant","refId":"A"}],
       "title":"User Prompt",
       "transformations":[
         {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
@@ -866,14 +866,14 @@
               "scope.version":true,
               "service.name":true,
               "service.version":true,
-              "session.id":false,
+              "conversation.id":false,
               "severity":true,
               "terminal.type":true,
               "unit":false,
               "user.id":true
             },
             "includeByName":{},
-            "indexByName":{"Line":17,"Time":0,"_stream_id":20,"detected_level":18,"event.name":14,"event.sequence":3,"event.timestamp":1,"host.arch":12,"ip":21,"job":22,"labels":19,"os.type":10,"os.version":11,"prompt":15,"prompt_length":4,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"session.id":2,"severity":16,"terminal.type":13,"user.id":5},
+            "indexByName":{"Line":17,"Time":0,"_stream_id":20,"detected_level":18,"event.name":14,"event.sequence":3,"event.timestamp":1,"host.arch":12,"ip":21,"job":22,"labels":19,"os.type":10,"os.version":11,"prompt":15,"prompt_length":4,"scope.name":6,"scope.version":7,"service.name":8,"service.version":9,"conversation.id":2,"severity":16,"terminal.type":13,"user.id":5},
             "renameByName":{
               "cache_creation_tokens":"T$.Create",
               "cache_read_tokens":"T$.Read",
@@ -899,7 +899,7 @@
               "scope.version":"Version",
               "service.name":"Service",
               "service.version":"Ver",
-              "session.id":"Session",
+              "conversation.id":"Conversation",
               "source":"Source",
               "success":"Success",
               "terminal.type":"Term",
@@ -955,7 +955,7 @@
       "id":71,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) count() as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) count() as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"API Request by Model",
       "type":"timeseries"
     },
@@ -998,7 +998,7 @@
       "id":76,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) sum(cost_usd) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) sum(cost_usd) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"Cost by Model",
       "type":"timeseries"
     },
@@ -1009,7 +1009,7 @@
         "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
         "overrides":[
           {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-          {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+          {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
           {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
           {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
           {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -1108,7 +1108,7 @@
       "id":70,
       "options":{"cellHeight":"sm","showHeader":true,"sortBy":[{"desc":true,"displayName":"Time"}]},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\"","queryType":"instant","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\"","queryType":"instant","refId":"A"}],
       "title":"API Requests",
       "transformations":[
         {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
@@ -1138,7 +1138,7 @@
               "scope.version":true,
               "service.name":true,
               "service.version":true,
-              "session.id":true,
+              "conversation.id":true,
               "severity":true,
               "terminal.type":true,
               "unit":false,
@@ -1169,7 +1169,7 @@
               "scope.version":5,
               "service.name":6,
               "service.version":7,
-              "session.id":2,
+              "conversation.id":2,
               "severity":14,
               "terminal.type":11,
               "user.id":3
@@ -1199,7 +1199,7 @@
               "scope.version":"Version",
               "service.name":"Service",
               "service.version":"Ver",
-              "session.id":"Session",
+              "conversation.id":"Conversation",
               "source":"Source",
               "success":"Success",
               "terminal.type":"Term",
@@ -1256,7 +1256,7 @@
       "id":72,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) sum(input_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) sum(input_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"Input Tokens",
       "type":"timeseries"
     },
@@ -1299,7 +1299,7 @@
       "id":73,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) sum(output_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) sum(output_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"Output Tokens",
       "type":"timeseries"
     },
@@ -1342,7 +1342,7 @@
       "id":74,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) sum(cache_read_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) sum(cache_read_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"Cache Read Tokens",
       "type":"timeseries"
     },
@@ -1385,7 +1385,7 @@
       "id":75,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.api_request session.id:\"$session\" | stats by (model) sum(cache_creation_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.api_request conversation.id:\"$conversation\" | stats by (model) sum(cache_creation_tokens) as requests","legendFormat":"{{ model }}","queryType":"statsRange","refId":"A"}],
       "title":"Cache Creation Tokens",
       "type":"timeseries"
     },
@@ -1429,7 +1429,7 @@
       "id":63,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.tool_result session.id:\"$session\" | stats by (tool_name) count() as requests","legendFormat":"{{ tool_name }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.tool_result conversation.id:\"$conversation\" | stats by (tool_name) count() as requests","legendFormat":"{{ tool_name }}","queryType":"statsRange","refId":"A"}],
       "title":"Event by Tool Name",
       "type":"timeseries"
     },
@@ -1472,7 +1472,7 @@
       "id":68,
       "options":{"legend":{"calcs":["sum"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":true,"mode":"multi","sort":"desc"}},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.tool_result session.id:\"$session\" | stats by (decision_type) count() as requests","legendFormat":"{{ decision_type }}","queryType":"statsRange","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.tool_result conversation.id:\"$conversation\" | stats by (decision_type) count() as requests","legendFormat":"{{ decision_type }}","queryType":"statsRange","refId":"A"}],
       "title":"Accept / Reject",
       "type":"timeseries"
     },
@@ -1483,7 +1483,7 @@
         "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
         "overrides":[
           {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-          {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+          {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
           {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
           {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
           {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -1582,7 +1582,7 @@
       "id":64,
       "options":{"cellHeight":"sm","showHeader":true,"sortBy":[{"desc":true,"displayName":"Time"}]},
       "pluginVersion":"12.3.1",
-      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"_msg:claude_code.tool_result session.id:\"$session\"","queryType":"instant","refId":"A"}],
+      "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"event.name:codex.tool_result conversation.id:\"$conversation\"","queryType":"instant","refId":"A"}],
       "title":"Tool Results",
       "transformations":[
         {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
@@ -1612,7 +1612,7 @@
               "scope.version":true,
               "service.name":true,
               "service.version":true,
-              "session.id":true,
+              "conversation.id":true,
               "severity":true,
               "terminal.type":true,
               "unit":false,
@@ -1640,7 +1640,7 @@
               "scope.version":5,
               "service.name":6,
               "service.version":7,
-              "session.id":2,
+              "conversation.id":2,
               "severity":14,
               "success":24,
               "terminal.type":11,
@@ -1675,7 +1675,7 @@
               "scope.version":"Version",
               "service.name":"Service",
               "service.version":"Ver",
-              "session.id":"Session",
+              "conversation.id":"Conversation",
               "source":"Source",
               "success":"Success",
               "terminal.type":"Term",
@@ -1705,7 +1705,7 @@
             "defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"footer":{"reducers":[]},"inspect":true},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"text","value":0}]}},
             "overrides":[
               {"matcher":{"id":"byName","options":"Time"},"properties":[{"id":"custom.width","value":160}]},
-              {"matcher":{"id":"byName","options":"Session"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"Claude Code : ${__data.fields.Session}","url":"/d/claude-code?var-session=${__data.fields.Session}&${__url_time_range}"}]}]},
+              {"matcher":{"id":"byName","options":"Conversation"},"properties":[{"id":"custom.width","value":300},{"id":"custom.cellOptions","value":{"type":"auto"}},{"id":"color","value":{"fixedColor":"#6c6c6ce0","mode":"fixed"}},{"id":"links","value":[{"title":"OpenAI Codex : ${__data.fields.Conversation}","url":"/d/openai-codex-pigsty?var-conversation=${__data.fields.Conversation}&${__url_time_range}"}]}]},
               {"matcher":{"id":"byName","options":"UserID"},"properties":[{"id":"custom.width","value":550}]},{"matcher":{"id":"byName","options":"Scope"},"properties":[{"id":"custom.width","value":250}]},{"matcher":{"id":"byName","options":"Version"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"Service"},"properties":[{"id":"custom.width","value":100}]},
               {"matcher":{"id":"byName","options":"Ver"},"properties":[{"id":"custom.width","value":60}]},{"matcher":{"id":"byName","options":"OS"},"properties":[{"id":"custom.width","value":70}]},{"matcher":{"id":"byName","options":"OS Ver"},"properties":[{"id":"custom.width","value":220}]},{"matcher":{"id":"byName","options":"Arch"},"properties":[{"id":"custom.width","value":60}]},
               {"matcher":{"id":"byName","options":"Term"},"properties":[{"id":"custom.width","value":100}]},
@@ -1804,8 +1804,8 @@
           "id":54,
           "options":{"cellHeight":"sm","showHeader":true,"sortBy":[]},
           "pluginVersion":"12.3.1",
-          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude ","queryType":"instant","refId":"A"}],
-          "title":"Claude Code Logs",
+          "targets":[{"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"editorMode":"code","expr":"job:claude service.name:codex_cli_rs ","queryType":"instant","refId":"A"}],
+          "title":"OpenAI Codex Logs",
           "transformations":[
             {"id":"extractFields","options":{"format":"auto","jsonPaths":[],"keepTime":false,"replace":false,"source":"labels"}},
             {
@@ -1843,7 +1843,7 @@
                   "scope.version":4,
                   "service.name":5,
                   "service.version":6,
-                  "session.id":1,
+                  "conversation.id":1,
                   "severity":28,
                   "source":24,
                   "success":25,
@@ -1878,7 +1878,7 @@
                   "scope.version":"Version",
                   "service.name":"Service",
                   "service.version":"Ver",
-                  "session.id":"Session",
+                  "conversation.id":"Conversation",
                   "source":"Source",
                   "success":"Success",
                   "terminal.type":"Term",
@@ -1903,12 +1903,12 @@
   "refresh":"30s",
   "schemaVersion":42,
   "tags":["Claude","NODE","Pigsty"],
-  "templating":{"list":[{"current":{},"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"definition":"job:claude","description":"Claude Code SessionID","label":"Session","name":"session","options":[],"query":{"field":"session.id","limit":1000,"query":"job:claude","refId":"VictoriaLogsVariableQueryEditor-VariableQuery","type":"fieldValue"},"refresh":1,"regex":"","type":"query"}]},
+  "templating":{"list":[{"current":{},"datasource":{"type":"victoriametrics-logs-datasource","uid":"ds-vlogs"},"definition":"job:claude service.name:codex_cli_rs","description":"OpenAI Codex ConversationID","label":"Conversation","name":"conversation","options":[],"query":{"field":"conversation.id","limit":1000,"query":"job:claude service.name:codex_cli_rs","refId":"VictoriaLogsVariableQueryEditor-VariableQuery","type":"fieldValue"},"refresh":1,"regex":"","type":"query"}]},
   "time":{"from":"now-1h","to":"now"},
   "timepicker":{"refresh_intervals":["5s","10s","30s","1m","5m"]},
   "timezone":"browser",
-  "title":"Claude Code - Pigstry",
-  "uid":"claude-code",
+  "title":"OpenAI Codex - Pigstry",
+  "uid":"openai-codex-pigsty",
   "version":1,
   "weekStart":"",
   "author":"Ruohang Feng (rh@vonng.com)",
