@@ -25,7 +25,7 @@ Local observability stack for monitoring Claude Code usage, costs, and performan
 ### 1. Start the monitoring stack
 
 ```bash
-cd claude_code_metrics
+cd token_metrics
 docker-compose up -d
 ```
 
